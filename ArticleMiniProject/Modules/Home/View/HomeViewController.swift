@@ -21,6 +21,8 @@ class HomeViewController : HomeBuilder {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
+        let greeting = getGreetingBasedOnLocalTime()
+        greetingLabel.text = greeting
     }
     override func viewDidLoad() {
         super.viewDidLoad()

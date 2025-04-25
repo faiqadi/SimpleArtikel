@@ -14,7 +14,6 @@ class HomeBuilder: BaseViewController {
         let label = UILabel()
         label.textColor = UIColor(color: .purple10)
         label.font = UIFont(.kappa, .regular)
-        label.text = "Good Morning"
         label.textAlignment = .center
         return label
     }()
