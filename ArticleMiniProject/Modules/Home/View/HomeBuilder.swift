@@ -21,7 +21,7 @@ class HomeBuilder: BaseViewController {
         let label = UILabel()
         label.textColor = UIColor(color: .purple10)
         label.font = UIFont(.omicron, .regular)
-        label.text = "Faiq"
+        label.text = UserDefaults.username
         label.textAlignment = .center
         return label
     }()
@@ -39,6 +39,15 @@ class HomeBuilder: BaseViewController {
         stv.addArrangedSubview(reportCollectionView)
 
         return stv
+    }()
+    let logoutBtn: UIButton = {
+        let btn = UIButton()
+        btn.setTitle("Logout", for: .normal)
+        btn.backgroundColor = UIColor(color: .green5)
+        btn.setTitleColor(UIColor(color: .gray80), for: .normal)
+        btn.titleLabel?.font = UIFont(.omicron, .bold)
+        btn.layer.cornerRadius = 25
+        return btn
     }()
     var artikelHeader: ContentHeader = {
         let header = ContentHeader()
@@ -117,6 +126,7 @@ class HomeBuilder: BaseViewController {
         view.addSubview(greetingLabel)
         view.addSubview(userLabel)
         view.addSubview(contentContainer)
+        view.addSubview(logoutBtn)
         
         greetingLabel.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
@@ -130,7 +140,10 @@ class HomeBuilder: BaseViewController {
             make.left.right.equalToSuperview().inset(16)
             make.top.equalTo(userLabel.snp.bottom).inset(-32)
         }
-        
+        logoutBtn.snp.makeConstraints { make in
+            make.right.bottom.equalToSuperview().inset(16)
+            make.height.width.equalTo(60)
+        }
     }
     
     func collectionViewCreateLayout() -> UICollectionViewCompositionalLayout {

@@ -94,6 +94,9 @@ class LoginBuilder: BaseViewController {
         super.viewDidLoad()
         
         setupLayoutPage()
+        
+        //MARK: remove bellow when login is not using webview
+        registBtn.isHidden = true
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -148,7 +151,7 @@ class LoginBuilder: BaseViewController {
             make.left.right.equalToSuperview().inset(64)
         }
         loginBtn.snp.makeConstraints { make in
-            make.bottom.equalTo(registBtn.snp.top).inset(-16)
+            make.bottom.equalTo(registBtn.snp.top).inset(-116)
             make.left.right.equalToSuperview().inset(64)
         }
     }

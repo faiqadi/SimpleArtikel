@@ -19,6 +19,7 @@ pod 'Alamofire'
 pod 'Auth0'
 pod 'GIFImageView'
 pod 'IQKeyboardManagerSwift'
+pod 'JWTDecode
 pod 'Kingfisher'
 pod 'ObjectMapper'
 pod 'PasswordTextField'

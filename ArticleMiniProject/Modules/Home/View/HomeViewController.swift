@@ -64,6 +64,10 @@ class HomeViewController : HomeBuilder {
             self?.navigationController?.pushViewController(vc, animated: true)
         }).disposed(by: disposeBag)
         
+        logoutBtn.rx.tap.subscribe(onNext: { [weak self] in
+            self?.logout()
+        }).disposed(by: disposeBag)
+        
         reportHeader.seeMoreBtn.rx.tap.subscribe(onNext: { [weak self] in
             let vc = MoreViewController()
             vc.pageType = .Reports

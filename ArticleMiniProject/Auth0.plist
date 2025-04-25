@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-<dict/>
+<dict>
+	<key>Domain</key>
+	<string>dev-arqoaouq6gtcjn2r.us.auth0.com</string>
+	<key>ClientId</key>
+	<string>bzLdopItfrAKdvIZmeWE5wJOZWIy6qKw</string>
+</dict>
 </plist>
