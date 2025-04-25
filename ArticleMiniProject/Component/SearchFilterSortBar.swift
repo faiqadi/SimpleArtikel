@@ -203,6 +203,7 @@ class SearchFilterSortBar: UIView {
     
     private func setupActions() {
         searchTextField.delegate = self
+        searchTextField.clearButtonMode = .always
         
         filterButton.addTarget(self, action: #selector(filterButtonTapped), for: .touchUpInside)
         sortButton.addTarget(self, action: #selector(sortButtonTapped), for: .touchUpInside)
@@ -310,6 +311,10 @@ extension SearchFilterSortBar: UITextFieldDelegate {
     func textFieldDidEndEditing(_ textField: UITextField) {
         onSearch?(textField.text ?? "")
     }
+    func textFieldShouldClear(_ textField: UITextField) -> Bool {
+        onSearch?("")
+            return true
+        }
 }
 
 // MARK: - Filter Panel View

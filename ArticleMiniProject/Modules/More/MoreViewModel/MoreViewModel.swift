@@ -48,13 +48,34 @@ class MoreViewModel{
     
     func searchArtikel(title: String, type: MorePageType){
         searchDataRelay.accept(.loading)
-        api.getArtikelSearch(title: title){[weak self] status, successResponse, errorResponse, error in
-            guard let self, status else {
-                self?.searchDataRelay.accept(.error(errorResponse ?? error ?? .custom(message: "Unexpected error")))
-                return
+       
+        switch type {
+        case .Artikel:
+            api.getArtikelSearch(title: title){[weak self] status, successResponse, errorResponse, error in
+                guard let self, status else {
+                    self?.searchDataRelay.accept(.error(errorResponse ?? error ?? .custom(message: "Unexpected error")))
+                    return
+                }
+                searchDataRelay.accept(.next(successResponse?.results))
             }
-            searchDataRelay.accept(.next(successResponse?.results))
+        case .Blog:
+            api.getBlogContain(title: title){[weak self] status, successResponse, errorResponse, error in
+                guard let self, status else {
+                    self?.searchDataRelay.accept(.error(errorResponse ?? error ?? .custom(message: "Unexpected error")))
+                    return
+                }
+                searchDataRelay.accept(.next(successResponse?.results))
+            }
+        case .Reports:
+            api.getReportContain(title: title){[weak self] status, successResponse, errorResponse, error in
+                guard let self, status else {
+                    self?.searchDataRelay.accept(.error(errorResponse ?? error ?? .custom(message: "Unexpected error")))
+                    return
+                }
+                searchDataRelay.accept(.next(successResponse?.results))
+            }
         }
     }
+    
     
 }

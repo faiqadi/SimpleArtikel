@@ -99,6 +99,7 @@ class MoreViewController: MoreBuilder {
             } else {
                 self?.viewModel.searchArtikel(title: searchText, type: self?.pageType ?? .Artikel)
             }
+            self?.tableView.reloadData()
         }
         
         searchBar.onSortOrderSelected = { [weak self] sortOrder in
