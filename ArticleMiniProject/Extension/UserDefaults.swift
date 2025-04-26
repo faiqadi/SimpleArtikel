@@ -11,7 +11,7 @@ extension UserDefaults {
         static let is_authenticated = "IS_AUTHENTICATED"
         static let username = "USERNAME"
         static let token = "TOKEN"
-        
+        static let is_login = "IS_LOGIN"
     }
     
     class var isAuthenticated: Bool {
@@ -36,6 +36,14 @@ extension UserDefaults {
         }
         set {
             UserDefaults.standard.set(newValue, forKey: Keys.token)
+        }
+    }
+    class var isLogin: Bool {
+        get {
+            return UserDefaults.standard.bool(forKey: Keys.is_login)
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: Keys.is_login)
         }
     }
 }

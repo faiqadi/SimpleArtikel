@@ -17,6 +17,7 @@ class BaseViewController: UIViewController {
     var viewWidth = 0.0
     var viewHeight = 0.0
     
+    private let disposeBag = DisposeBag()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -24,6 +25,21 @@ class BaseViewController: UIViewController {
         viewWidth = view.frame.width
         viewHeight = view.frame.height
         configureKeyboard()
+       
+        
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(handleLogout),
+                                               name: NSNotification.Name("userDidLogout"),
+                                               object: nil)
+        
+        PersistentTimer.shared.isTimerCompleted.subscribe(onNext: { isNotAuthorized in
+            if isNotAuthorized {
+                DispatchQueue.main.async {
+                     // execute your code
+                    self.handleLogout()
+                }
+            }
+        }).disposed(by: disposeBag)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -53,19 +69,21 @@ class BaseViewController: UIViewController {
             return "Good night"
         }
     }
-    func logout(){
-        Auth0.webAuth()
-            .clearSession { result in
-                switch result {
-                case .success:
-                    UserDefaults.isAuthenticated = false
-                    let vc = LoginViewController()
-                    vc.modalTransitionStyle = .flipHorizontal
-                    self.navigationController?.pushViewController(vc, animated: true)
-                case .failure:
-                    print("")
-                    UserDefaults.isAuthenticated = false
-                }
+    @objc func handleLogout() {
+        // Navigate to login screen or update UI
+        Auth0Manager.shared.logout()
+        PersistentTimer.shared.cancelCountdown()
+        UserDefaults.isLogin = false
+        UserDefaults.isAuthenticated = false
+        navigationController?.popToRootViewController(animated: true)
+    }
+    func requestNotificationPermission() {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { granted, error in
+            if granted {
+                print("Notification permission granted")
+            } else if let error = error {
+                print("Error requesting notification permissions: \(error)")
             }
+        }
     }
 }

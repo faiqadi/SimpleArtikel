@@ -14,12 +14,12 @@ import JWTDecode
 class LoginViewController : LoginBuilder {
     
     private let disposeBag = DisposeBag()
-    private var credentialData = CredentialModel.empty
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        observ()
-        UserDefaults.isAuthenticated ? goToHome() : print("loged out")
+        
+        UserDefaults.isAuthenticated ? goToHome() : observ()
+        requestNotificationPermission()
     }
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -32,25 +32,13 @@ class LoginViewController : LoginBuilder {
     }
     
     private func loginAction(){
-        Auth0.webAuth()
-            .start { result in
-                switch result {
-                case .success(let credentials):
-                    UserDefaults.isAuthenticated = true
-                    
-                    self.credentialData = CredentialModel.from(credentials.idToken)
-                    
-                    if self.credentialData.name != "" {
-                        UserDefaults.username = self.credentialData.name
-                    } else {
-                        UserDefaults.username = self.credentialData.email
-                    }
-                    UserDefaults.token = credentials.accessToken
-                    self.goToHome()
-                case .failure(let error):
-                    print("error = \(error)")
-                }
-            }
+        Auth0Manager.shared.login()
+        Auth0Manager.shared.credentialDataRelay.subscribe(onNext: { value in
+            if (value.email != "") && (value.id != "") && !UserDefaults.isLogin && UserDefaults.isAuthenticated{
+                UserDefaults.isLogin = true
+                self.goToHome()
+            } 
+        }).disposed(by: disposeBag)
     }
     private func goToHome(){
         let vc = HomeViewController()

@@ -65,7 +65,7 @@ class HomeViewController : HomeBuilder {
         }).disposed(by: disposeBag)
         
         logoutBtn.rx.tap.subscribe(onNext: { [weak self] in
-            self?.logout()
+            self?.handleLogout()
         }).disposed(by: disposeBag)
         
         reportHeader.seeMoreBtn.rx.tap.subscribe(onNext: { [weak self] in
