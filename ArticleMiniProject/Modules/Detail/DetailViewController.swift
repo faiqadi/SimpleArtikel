@@ -97,13 +97,8 @@ class ArticleDetailViewController: UIViewController {
     
     // MARK: - Configure Data
     private func configureData() {
-        if let publishedAt = publishedAt {
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateStyle = .long
-            dateFormatter.timeStyle = .short
-            dateFormatter.locale = Locale(identifier: "id_ID") // Set locale to Indonesian
-            publishedAtLabel.text = dateFormatter.string(from: publishedAt)
-        }
+        let dateConverted = Converter.convertDateToString(Date: publishedAt ?? Date())
+        publishedAtLabel.text = dateConverted
         
         if let summary = summary {
             let firstSentence = summary.components(separatedBy: ".").first ?? ""

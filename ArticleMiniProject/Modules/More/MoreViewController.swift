@@ -164,10 +164,10 @@ extension MoreViewController: UITableViewDelegate, UITableViewDataSource {
         
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let articleDetailVC = ArticleDetailViewController()
-        articleDetailVC.publishedAt = Date() // Ganti dengan tanggal yang sesuai
+        articleDetailVC.publishedAt = dataList[indexPath.row].publishedAt?.toDate()
         articleDetailVC.titleLabel.text = dataList[indexPath.row].title
         articleDetailVC.summary = dataList[indexPath.row].summary
-        articleDetailVC.previewImageUrl = dataList[indexPath.row].imageUrl // Ganti dengan URL gambar yang sesuai
+        articleDetailVC.previewImageUrl = dataList[indexPath.row].imageUrl 
         navigationController?.pushViewController(articleDetailVC, animated: true)
     }
         
