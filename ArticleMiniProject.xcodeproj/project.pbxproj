@@ -12,6 +12,8 @@
 		2911847A2DBB9EC3007D4559 /* Auth0Manager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 291184792DBB9EBF007D4559 /* Auth0Manager.swift */; };
 		2911847D2DBBCBA6007D4559 /* CredentialModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2911847C2DBBCBA1007D4559 /* CredentialModel.swift */; };
 		291184802DBCC052007D4559 /* PersistentTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2911847F2DBCC04D007D4559 /* PersistentTimer.swift */; };
+		291184822DBD4B8D007D4559 /* CheckBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 291184812DBD4B86007D4559 /* CheckBox.swift */; };
+		291184842DBD4BDF007D4559 /* FilterPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 291184832DBD4BDA007D4559 /* FilterPanel.swift */; };
 		292E3A4C2DB8DCFD00CBE81C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 292E3A422DB8DCFD00CBE81C /* AppDelegate.swift */; };
 		292E3A4D2DB8DCFD00CBE81C /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 292E3A492DB8DCFD00CBE81C /* SceneDelegate.swift */; };
 		292E3A4E2DB8DCFD00CBE81C /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 292E3A4A2DB8DCFD00CBE81C /* ViewController.swift */; };
@@ -86,6 +88,8 @@
 		291184792DBB9EBF007D4559 /* Auth0Manager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Auth0Manager.swift; sourceTree = "<group>"; };
 		2911847C2DBBCBA1007D4559 /* CredentialModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialModel.swift; sourceTree = "<group>"; };
 		2911847F2DBCC04D007D4559 /* PersistentTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistentTimer.swift; sourceTree = "<group>"; };
+		291184812DBD4B86007D4559 /* CheckBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckBox.swift; sourceTree = "<group>"; };
+		291184832DBD4BDA007D4559 /* FilterPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterPanel.swift; sourceTree = "<group>"; };
 		292E3A422DB8DCFD00CBE81C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		292E3A432DB8DCFD00CBE81C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		292E3A442DB8DCFD00CBE81C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -203,6 +207,16 @@
 			path = Customs;
 			sourceTree = "<group>";
 		};
+		291184852DBD4E3B007D4559 /* SearchFilterSort */ = {
+			isa = PBXGroup;
+			children = (
+				296C7EE42DB96B1C00BDF198 /* SearchFilterSortBar.swift */,
+				291184832DBD4BDA007D4559 /* FilterPanel.swift */,
+				291184812DBD4B86007D4559 /* CheckBox.swift */,
+			);
+			path = SearchFilterSort;
+			sourceTree = "<group>";
+		};
 		292E3A4B2DB8DCFD00CBE81C /* ArticleMiniProject */ = {
 			isa = PBXGroup;
 			children = (
@@ -265,10 +279,10 @@
 		296C7EA12DB8E84900BDF198 /* Component */ = {
 			isa = PBXGroup;
 			children = (
+				291184852DBD4E3B007D4559 /* SearchFilterSort */,
 				2911847E2DBCC03F007D4559 /* Customs */,
 				296C7F0A2DBB49DE00BDF198 /* ProgressView.swift */,
 				296C7EEA2DB9748900BDF198 /* PreviewContainer.swift */,
-				296C7EE42DB96B1C00BDF198 /* SearchFilterSortBar.swift */,
 				296C7EDA2DB93DEC00BDF198 /* ContentHeader.swift */,
 				296C7EB82DB9259000BDF198 /* CustomPasswordTextField.swift */,
 			);
@@ -690,6 +704,7 @@
 				296C7F032DBB382500BDF198 /* BaseErrorResponse.swift in Sources */,
 				292E3A4C2DB8DCFD00CBE81C /* AppDelegate.swift in Sources */,
 				296C7EB12DB91A8300BDF198 /* UIColor.swift in Sources */,
+				291184842DBD4BDF007D4559 /* FilterPanel.swift in Sources */,
 				296C7ED92DB9388600BDF198 /* HomeViewController.swift in Sources */,
 				296C7EDE2DB9485200BDF198 /* ContentListCollectionViewCell.swift in Sources */,
 				296C7EB52DB9227600BDF198 /* String.swift in Sources */,
@@ -706,6 +721,7 @@
 				296C7EE92DB96E5700BDF198 /* MoreViewController.swift in Sources */,
 				296C7EEE2DB9764700BDF198 /* ArticlePreviewTableViewCell.swift in Sources */,
 				296C7EAC2DB9180100BDF198 /* LoginViewController.swift in Sources */,
+				291184822DBD4B8D007D4559 /* CheckBox.swift in Sources */,
 				296C7EEB2DB9748D00BDF198 /* PreviewContainer.swift in Sources */,
 				292E3A4E2DB8DCFD00CBE81C /* ViewController.swift in Sources */,
 				296C7EE72DB96D3200BDF198 /* MoreBuilder.swift in Sources */,

@@ -75,8 +75,27 @@ class SearchFilterSortBar: UIView {
         return view
     }()
     
+    // Recent searches table view
+    private lazy var recentSearchesTableView: UITableView = {
+        let tableView = UITableView()
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "RecentSearchCell")
+        tableView.backgroundColor = .systemBackground
+        tableView.layer.cornerRadius = 8
+        tableView.layer.shadowColor = UIColor.black.cgColor
+        tableView.layer.shadowOffset = CGSize(width: 0, height: 2)
+        tableView.layer.shadowRadius = 6
+        tableView.layer.shadowOpacity = 0.15
+        tableView.separatorInset = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 15)
+        tableView.isHidden = true
+        tableView.delegate = self
+        tableView.dataSource = self
+        return tableView
+    }()
+    
     // MARK: - Properties
     private var isFilterPanelVisible = false
+    private var isRecentSearchesVisible = false
+    private var recentSearches: [String] = UserDefaults.recentSearch
     
     // MARK: - Enums
     enum SortOrder {
@@ -88,6 +107,7 @@ class SearchFilterSortBar: UIView {
     var onSearch: ((String) -> Void)?
     var onSortOrderSelected: ((SortOrder) -> Void)?
     var onFilterApplied: (([String: Bool]) -> Void)?
+    var onRecentSearchSelected: ((String) -> Void)?
     
     // MARK: - Initialization
     override init(frame: CGRect) {
@@ -138,6 +158,24 @@ class SearchFilterSortBar: UIView {
         filterPanelView.setupFilterOptions(options: options)
     }
     
+    func setRecentSearches(_ searches: [String]) {
+        recentSearches = searches
+        recentSearchesTableView.reloadData()
+    }
+    
+    func addRecentSearch(_ search: String) {
+        if !search.isEmpty && !recentSearches.contains(search) {
+            recentSearches.insert(search, at: 0)
+            
+            // Limit the number of recent searches
+            if recentSearches.count > 10 {
+                recentSearches.removeLast()
+            }
+            
+            recentSearchesTableView.reloadData()
+        }
+    }
+    
     // MARK: - Private Methods
     private func setupViews() {
         backgroundColor = .clear
@@ -148,6 +186,7 @@ class SearchFilterSortBar: UIView {
         containerView.addSubview(dividerLine)
         containerView.addSubview(sortButton)
         addSubview(filterPanelView)
+        addSubview(recentSearchesTableView)
         
         // Set initial filter options for the example
         setupFilterOptions(options: ["Food", "Transportation", "Entertainment", "Shopping", "Bills"])
@@ -199,6 +238,14 @@ class SearchFilterSortBar: UIView {
             make.left.equalTo(containerView)
             make.right.equalTo(containerView)
         }
+        
+        // Recent searches table view constraints
+        recentSearchesTableView.snp.makeConstraints { make in
+            make.top.equalTo(containerView.snp.bottom).offset(4)
+            make.left.equalTo(containerView)
+            make.right.equalTo(containerView)
+            make.height.equalTo(200)
+        }
     }
     
     private func setupActions() {
@@ -207,6 +254,9 @@ class SearchFilterSortBar: UIView {
         
         filterButton.addTarget(self, action: #selector(filterButtonTapped), for: .touchUpInside)
         sortButton.addTarget(self, action: #selector(sortButtonTapped), for: .touchUpInside)
+        
+        // Add editing changed action for search text field
+        searchTextField.addTarget(self, action: #selector(searchTextFieldEditingChanged), for: .editingChanged)
         
         // Set filter panel callback
         filterPanelView.onApplyFilters = { [weak self] selectedFilters in
@@ -217,6 +267,7 @@ class SearchFilterSortBar: UIView {
     
     // MARK: - Actions
     @objc private func filterButtonTapped() {
+        hideRecentSearches()
         toggleFilterPanel()
     }
     
@@ -230,10 +281,44 @@ class SearchFilterSortBar: UIView {
     }
     
     @objc private func sortButtonTapped() {
+        hideRecentSearches()
+        
         if #available(iOS 14.0, *) {
             showSortMenu_iOS14()
         } else {
             showSortActionSheet()
+        }
+    }
+    
+    @objc private func searchTextFieldEditingChanged() {
+        // Show recent searches when typing starts
+        showRecentSearches()
+    }
+    
+    private func showRecentSearches() {
+        if !isRecentSearchesVisible && recentSearches.count > 0 {
+            isRecentSearchesVisible = true
+            isFilterPanelVisible = false
+            filterPanelView.isHidden = true
+            
+            recentSearchesTableView.isHidden = false
+            recentSearchesTableView.alpha = 0
+            
+            UIView.animate(withDuration: 0.3) {
+                self.recentSearchesTableView.alpha = 1.0
+            }
+        }
+    }
+    
+    private func hideRecentSearches() {
+        if isRecentSearchesVisible {
+            isRecentSearchesVisible = false
+            
+            UIView.animate(withDuration: 0.3) {
+                self.recentSearchesTableView.alpha = 0.0
+            } completion: { _ in
+                self.recentSearchesTableView.isHidden = true
+            }
         }
     }
     
@@ -290,12 +375,24 @@ class SearchFilterSortBar: UIView {
     }
     
     override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        // Check if point is in filter panel
         if !filterPanelView.isHidden {
             let convertedPoint = convert(point, to: filterPanelView)
             if filterPanelView.bounds.contains(convertedPoint) {
                 return filterPanelView.hitTest(convertedPoint, with: event)
             }
         }
+        
+        // Check if point is in recent searches table view
+        if !recentSearchesTableView.isHidden {
+            let convertedPoint = convert(point, to: recentSearchesTableView)
+            if recentSearchesTableView.bounds.contains(convertedPoint) {
+                return recentSearchesTableView.hitTest(convertedPoint, with: event)
+            }
+            // If the touch is outside the table view, hide it
+            hideRecentSearches()
+        }
+        
         return super.hitTest(point, with: event)
     }
 }
@@ -304,203 +401,86 @@ class SearchFilterSortBar: UIView {
 extension SearchFilterSortBar: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
-        onSearch?(textField.text ?? "")
+        let searchText = textField.text ?? ""
+        if !searchText.isEmpty {
+            addRecentSearch(searchText)
+        }
+        onSearch?(searchText)
+        hideRecentSearches()
         return true
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
-        onSearch?(textField.text ?? "")
+        let searchText = textField.text ?? ""
+        if !searchText.isEmpty {
+            addRecentSearch(searchText)
+        }
+        onSearch?(searchText)
+        hideRecentSearches()
     }
+    
     func textFieldShouldClear(_ textField: UITextField) -> Bool {
         onSearch?("")
-            return true
-        }
-}
-
-// MARK: - Filter Panel View
-class FilterPanelView: UIView {
-    // MARK: - UI Elements
-    private let titleLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Filter By Category"
-        label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
-        return label
-    }()
-    
-    private let stackView: UIStackView = {
-        let stackView = UIStackView()
-        stackView.axis = .vertical
-        stackView.spacing = 10
-        stackView.alignment = .leading
-        return stackView
-    }()
-    
-    private let applyButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("Apply", for: .normal)
-        button.backgroundColor = .systemBlue
-        button.setTitleColor(.white, for: .normal)
-        button.layer.cornerRadius = 6
-        return button
-    }()
-    
-    // MARK: - Properties
-    private var checkboxViews: [CheckboxView] = []
-    private var filterOptions: [String] = []
-    
-    // MARK: - Closures for actions
-    var onApplyFilters: (([String: Bool]) -> Void)?
-    
-    // MARK: - Initialization
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        setupViews()
-        setupConstraints()
-        setupActions()
+        hideRecentSearches()
+        return true
     }
     
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        setupViews()
-        setupConstraints()
-        setupActions()
-    }
-    
-    // MARK: - Public Methods
-    func setupFilterOptions(options: [String]) {
-        filterOptions = options
-        
-        // Remove existing checkboxes
-        stackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
-        checkboxViews = []
-        
-        // Add new checkboxes
-        for option in options {
-            let checkboxView = CheckboxView(title: option)
-            stackView.addArrangedSubview(checkboxView)
-            checkboxViews.append(checkboxView)
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        if recentSearches.count > 0 {
+            showRecentSearches()
         }
-    }
-    
-    // MARK: - Private Methods
-    private func setupViews() {
-        backgroundColor = .systemBackground
-        layer.cornerRadius = 8
-        
-        addSubview(titleLabel)
-        addSubview(stackView)
-        addSubview(applyButton)
-    }
-    
-    private func setupConstraints() {
-        titleLabel.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(16)
-            make.left.equalToSuperview().offset(16)
-            make.right.equalToSuperview().offset(-16)
-        }
-        
-        stackView.snp.makeConstraints { make in
-            make.top.equalTo(titleLabel.snp.bottom).offset(12)
-            make.left.equalToSuperview().offset(16)
-            make.right.equalToSuperview().offset(-16)
-        }
-        
-        applyButton.snp.makeConstraints { make in
-            make.top.equalTo(stackView.snp.bottom).offset(16)
-            make.left.equalToSuperview().offset(16)
-            make.right.equalToSuperview().offset(-16)
-            make.bottom.equalToSuperview().offset(-16)
-            make.height.equalTo(40)
-        }
-    }
-    
-    private func setupActions() {
-        applyButton.addTarget(self, action: #selector(applyButtonTapped), for: .touchUpInside)
-    }
-    
-    @objc private func applyButtonTapped() {
-        var selectedFilters: [String: Bool] = [:]
-        
-        for (index, checkbox) in checkboxViews.enumerated() {
-            selectedFilters[filterOptions[index]] = checkbox.isChecked
-        }
-        
-        onApplyFilters?(selectedFilters)
     }
 }
 
-// MARK: - Checkbox View
-class CheckboxView: UIView {
-    // MARK: - UI Elements
-    private let checkboxButton: UIButton = {
-        let button = UIButton(type: .custom)
-        button.setImage(UIImage(systemName: "square"), for: .normal)
-        button.setImage(UIImage(systemName: "checkmark.square.fill"), for: .selected)
-        button.tintColor = .systemBlue
-        return button
-    }()
-    
-    private let titleLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 16)
-        return label
-    }()
-    
-    // MARK: - Properties
-    var isChecked: Bool {
-        return checkboxButton.isSelected
+// MARK: - TableView DataSource and Delegate
+extension SearchFilterSortBar: UITableViewDataSource, UITableViewDelegate {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return recentSearches.count
     }
     
-    // MARK: - Initialization
-    init(title: String) {
-        super.init(frame: .zero)
-        titleLabel.text = title
-        setupViews()
-        setupConstraints()
-        setupActions()
-    }
-    
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        setupViews()
-        setupConstraints()
-        setupActions()
-    }
-    
-    // MARK: - Private Methods
-    private func setupViews() {
-        addSubview(checkboxButton)
-        addSubview(titleLabel)
-    }
-    
-    private func setupConstraints() {
-        checkboxButton.snp.makeConstraints { make in
-            make.left.equalToSuperview()
-            make.centerY.equalToSuperview()
-            make.width.height.equalTo(24)
-            make.top.bottom.equalToSuperview().inset(4)
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "RecentSearchCell", for: indexPath)
+        
+        if #available(iOS 14.0, *) {
+            var content = cell.defaultContentConfiguration()
+            content.text = recentSearches[indexPath.row]
+            content.image = UIImage(systemName: "clock")
+            content.imageProperties.tintColor = .systemGray
+            cell.contentConfiguration = content
+        } else {
+            cell.textLabel?.text = recentSearches[indexPath.row]
+            cell.imageView?.image = UIImage(systemName: "clock")
+            cell.imageView?.tintColor = .systemGray
         }
         
-        titleLabel.snp.makeConstraints { make in
-            make.left.equalTo(checkboxButton.snp.right).offset(8)
-            make.centerY.equalToSuperview()
-            make.right.equalToSuperview()
+        return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        let selectedSearch = recentSearches[indexPath.row]
+        setSearchText(selectedSearch)
+        onRecentSearchSelected?(selectedSearch)
+        onSearch?(selectedSearch)
+        hideRecentSearches()
+    }
+    
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return "Recent Searches"
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 44
+    }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            recentSearches.remove(at: indexPath.row)
+            tableView.deleteRows(at: [indexPath], with: .automatic)
+            
+            if recentSearches.isEmpty {
+                hideRecentSearches()
+            }
         }
-    }
-    
-    private func setupActions() {
-        checkboxButton.addTarget(self, action: #selector(checkboxTapped), for: .touchUpInside)
-        
-        // Add tap gesture to the whole view
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(viewTapped))
-        addGestureRecognizer(tapGesture)
-    }
-    
-    @objc private func checkboxTapped() {
-        checkboxButton.isSelected.toggle()
-    }
-    
-    @objc private func viewTapped() {
-        checkboxButton.isSelected.toggle()
     }
 }

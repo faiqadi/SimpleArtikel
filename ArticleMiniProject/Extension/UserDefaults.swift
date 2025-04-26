@@ -12,6 +12,7 @@ extension UserDefaults {
         static let username = "USERNAME"
         static let token = "TOKEN"
         static let is_login = "IS_LOGIN"
+        static let recent_search = "RECENT_SEARCH"
     }
     
     class var isAuthenticated: Bool {
@@ -46,4 +47,13 @@ extension UserDefaults {
             UserDefaults.standard.set(newValue, forKey: Keys.is_login)
         }
     }
+    class var recentSearch: [String] {
+        get {
+            return UserDefaults.standard.stringArray(forKey: Keys.recent_search) ?? []
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: Keys.recent_search)
+        }
+    }
+    
 }

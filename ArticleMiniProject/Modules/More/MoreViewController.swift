@@ -98,6 +98,7 @@ class MoreViewController: MoreBuilder {
                 self?.presentDataList = self?.dataList ?? [Article]()
             } else {
                 self?.viewModel.searchArtikel(title: searchText, type: self?.pageType ?? .Artikel)
+                UserDefaults.recentSearch.append(searchText)
             }
             self?.tableView.reloadData()
         }
